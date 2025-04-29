@@ -1,8 +1,6 @@
 from flask import Flask
 from flask_mysqldb import MySQL
-from app.config import Config  # ← Caminho corrigido
-from app.routes.auth import auth_routes
-from app.routes.chat import chat_routes
+from config import Config
 
 mysql = MySQL()
 
@@ -12,8 +10,8 @@ def create_app():
 
     mysql.init_app(app)
 
-    # Registrar rotas
-    auth_routes(app, mysql)
-    chat_routes(app, mysql)
+    # Importa o Blueprint e registra
+    from app.routes.auth import auth_bp, init_auth_routes
+    init_auth_routes(app, mysql)
 
     return app

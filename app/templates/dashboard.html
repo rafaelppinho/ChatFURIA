@@ -1,8 +1,12 @@
 <!DOCTYPE html>
-<html>
-<head><title>Dashboard</title></head>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
 <body>
-  <h1>Bem-vindo, {{ username }}!</h1>
-  <a href="{{ url_for('logout') }}">Sair</a>  
+    <h2>Bem-vindo, {{ username }}!</h2>
+    <p>Você está logado.</p>
+    <a href="{{ url_for('auth.logout') }}">Sair</a>
 </body>
 </html>
