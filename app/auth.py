@@ -1,15 +1,11 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, current_app
 from werkzeug.security import check_password_hash, generate_password_hash
 
 auth_bp = Blueprint('auth', __name__)
 
 def init_auth_routes(app, mysql):
-    # Aqui conectamos o Blueprint ao app
     app.register_blueprint(auth_bp)
-
-    # Adicionamos a variável mysql ao Blueprint
     auth_bp.mysql = mysql
-
 
 @auth_bp.route('/')
 def home():
@@ -21,14 +17,14 @@ def login():
         email = request.form['email']
         password = request.form['password']
 
-        print("Dados recebidos:", email, password)
+        print("valores recebidos: ", email, password)
 
         try:
-            cur = auth_bp.mysql.connection.cursor()
+            print("conexao: ", auth_bp.mysql.connection)
+            cur = current_app.extensions['mysql'].connection.cursor()
             cur.execute("SELECT * FROM users WHERE email = %s", (email,))
             user = cur.fetchone()
             cur.close()
-            print("Usuário encontrado:", user)
         except Exception as e:
             flash(f"Erro ao acessar o banco: {e}")
             return redirect(url_for('auth.login'))
@@ -51,14 +47,13 @@ def register():
         hashed_password = generate_password_hash(password)
 
         try:
-            cur = auth_bp.mysql.connection.cursor()
+            cur = current_app.extensions['mysql'].connection.cursor()
             cur.execute(
                 "INSERT INTO users (email, username, password_hash) VALUES (%s, %s, %s)",
                 (email, username, hashed_password)
             )
             auth_bp.mysql.connection.commit()
             cur.close()
-            print("Usuário registrado:", username)
         except Exception as e:
             flash(f"Erro ao registrar usuário: {e}")
             return redirect(url_for('auth.register'))
